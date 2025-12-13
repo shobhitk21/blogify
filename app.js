@@ -14,20 +14,44 @@ let isConnected = false;
 const connectMongo = async () => {
   if (isConnected) return;
 
-  try {
-    await mongoose.connect(process.env.MONGO_URL, {
-      serverSelectionTimeoutMS: 5000,
-    });
+  await mongoose.connect(process.env.MONGO_URL, {
+    serverSelectionTimeoutMS: 5000,
+  });
 
-    isConnected = true;
-    console.log("MongoDB connected");
-  } catch (err) {
-    console.error("Mongo connection error:", err);
-  }
+  isConnected = true;
+  console.log("MongoDB connected");
 };
 
-// Connect once per cold start
+// Start connection
 connectMongo();
+
+app.use(async (req, res, next) => {
+    if (mongoose.connection.readyState === 1) {
+      return next();
+    }
+  
+    try {
+      await connectMongo();
+      next();
+    } catch (err) {
+      res.status(503).send("Database not connected");
+    }
+  });
+  
+
+// ⬇️ CRITICAL middleware (fixes your error)
+app.use(async (req, res, next) => {
+  if (mongoose.connection.readyState === 1) {
+    return next();
+  }
+
+  try {
+    await connectMongo();
+    next();
+  } catch (err) {
+    return res.status(503).send("Database connection failed");
+  }
+});
 
 // Routes
 const staticRouter = require("./routes/staticRouter");
@@ -44,7 +68,7 @@ app.use(cookieParser());
 app.use(checkForAuthCookie("token"));
 app.use(express.static(path.join(__dirname, "public")));
 
-// Routes usage
+// Route usage
 app.use("/user", staticRouter);
 app.use("/user", userRouter);
 app.use("/", urlRouter);
