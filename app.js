@@ -5,12 +5,24 @@ const app = express()
 const PORT = process.env.PORT || 3000;
 const path = require("path")
 const mongoose = require("mongoose")
+let isConnected = false
 const cookieParser = require("cookie-parser")
 const { checkForAuthCookie } = require("./middleware/auth")
 
-mongoose
-    .connect(process.env.MONGO_URL)
-    .then(() => console.log("mongodb connected!!"))
+const connectMongo = async () => {
+    if (isConnected) return;
+
+    try {
+        await mongoose.connect(process.env.MONGO_URL);
+        isConnected = true;
+        console.log("MongoDB connected");
+    } catch (err) {
+        console.error("Mongo error:", err);
+    }
+};
+
+connectMongo();
+
 
 const staticRouter = require("./routes/staticRouter")
 const userRouter = require("./routes/user")
@@ -31,4 +43,6 @@ app.use("/user", userRouter)
 app.use("/", urlRouter)
 
 
-app.listen(PORT, () => console.log("server started at port 3000!!"));
+// app.listen(PORT, () => console.log("server started at port 3000!!"));
+module.exports = app;
+
