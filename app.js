@@ -7,51 +7,11 @@ const mongoose = require("mongoose");
 const cookieParser = require("cookie-parser");
 const { checkForAuthCookie } = require("./middleware/auth");
 
-mongoose.set("bufferCommands", false);
-
-let isConnected = false;
-
-const connectMongo = async () => {
-  if (isConnected) return;
-
-  await mongoose.connect(process.env.MONGO_URL, {
-    serverSelectionTimeoutMS: 5000,
-  });
-
-  isConnected = true;
-  console.log("MongoDB connected");
-};
-
-// Start connection
-connectMongo();
-
-app.use(async (req, res, next) => {
-    if (mongoose.connection.readyState === 1) {
-      return next();
-    }
-  
-    try {
-      await connectMongo();
-      next();
-    } catch (err) {
-      res.status(503).send("Database not connected");
-    }
-  });
-  
-
-// ⬇️ CRITICAL middleware (fixes your error)
-app.use(async (req, res, next) => {
-  if (mongoose.connection.readyState === 1) {
-    return next();
-  }
-
-  try {
-    await connectMongo();
-    next();
-  } catch (err) {
-    return res.status(503).send("Database connection failed");
-  }
-});
+// MongoDB 
+mongoose
+  .connect(process.env.MONGO_URL)
+  .then(() => console.log("MongoDB connected"))
+  .catch((err) => console.error("Mongo error:", err));
 
 // Routes
 const staticRouter = require("./routes/staticRouter");
@@ -68,9 +28,12 @@ app.use(cookieParser());
 app.use(checkForAuthCookie("token"));
 app.use(express.static(path.join(__dirname, "public")));
 
-// Route usage
+// Routes
 app.use("/user", staticRouter);
 app.use("/user", userRouter);
 app.use("/", urlRouter);
 
-module.exports = app;
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
