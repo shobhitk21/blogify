@@ -1,0 +1,81 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+    <div class="container">
+
+        <!-- Brand -->
+        <a class="navbar-brand fw-bold" href="/">
+            Blogify
+        </a>
+
+        <!-- Mobile Toggle -->
+        <button
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#navbarNav"
+            aria-controls="navbarNav"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+        >
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- Nav Links -->
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
+
+                <!-- Home -->
+                <li class="nav-item">
+                    <a class="nav-link active" href="/">
+                        Home
+                    </a>
+                </li>
+
+                <% if (locals.user) { %>
+                    <!-- Add Blog -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="/add-new-blog">
+                            Add Blog
+                        </a>
+                    </li>
+
+                    <!-- User Dropdown -->
+                    <li class="nav-item dropdown">
+                        <a
+                            class="nav-link dropdown-toggle d-flex align-items-center gap-1"
+                            href="#"
+                            role="button"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false"
+                        >
+                            <i class="bi bi-person-circle"></i>
+                            <%= user.fullName %>
+                        </a>
+
+                        <ul class="dropdown-menu dropdown-menu-end shadow">
+                            <li>
+                                <a class="dropdown-item text-danger" href="/logout">
+                                    Log out
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                <% } else { %>
+                    <!-- Login -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="/user/login">
+                            Login
+                        </a>
+                    </li>
+
+                    <!-- Signup -->
+                    <li class="nav-item">
+                        <a class="nav-link btn btn-outline-light px-3 ms-lg-2" href="/user/signup">
+                            Sign Up
+                        </a>
+                    </li>
+                <% } %>
+
+            </ul>
+        </div>
+    </div>
+</nav>

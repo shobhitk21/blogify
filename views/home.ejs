@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include("./partials/head") %>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blogify</title>
+
+    <style>
+        .blog-card img {
+            height: 180px;
+            object-fit: cover;
+        }
+    </style>
+</head>
+
+<body class="bg-light">
+
+    <%- include("./partials/nav") %>
+
+    <div class="container my-4">
+        <div class="row g-3">
+            <% blogs.forEach(blog => { %>
+                <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                    <a href="/blog/<%= blog._id %>" class="text-decoration-none text-dark">
+                        <div class="card blog-card h-100 shadow-sm border-0 rounded-3">
+
+                            <!-- Cover Image -->
+                            <img
+                                src="/uploads/<%= blog.coverImageURL %>"
+                                class="card-img-top"
+                                alt="Blog cover image"
+                            />
+
+                            <!-- Card Body -->
+                            <div class="card-body d-flex flex-column p-3">
+                                <h6 class="card-title fw-semibold text-truncate mb-2">
+                                    <%= blog.title %>
+                                </h6>
+
+                                <span class="mt-auto text-primary small">
+                                    Read more →
+                                </span>
+                            </div>
+
+                        </div>
+                    </a>
+                </div>
+            <% }) %>
+        </div>
+    </div>
+
+    <%- include("./partials/scripts") %>
+
+</body>
+</html>
